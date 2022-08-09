@@ -26,11 +26,12 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 func (svc *userService) VerifyCredential(username string, password string, outlet_id string) interface{} {
 	log.Printf("UserService : VerifyCredential")
 	res := svc.userRepository.VerifyCredential(username, password)
-	v := res.(entity.User)
-
-	if (v.Username == username) && (v.Password == password){
-		if (v.Outlet_ID == outlet_id){
-			return res
+	if v, ok := res.(entity.User); ok {
+		comparedPassword := comparePassword(v.Password, []byte(password))
+		if v.Username == username && comparedPassword {
+			if v.Outlet_ID == outlet_id {
+				return res
+			}
 		}
 	}
 	return false
