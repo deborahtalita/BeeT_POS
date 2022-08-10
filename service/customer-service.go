@@ -2,15 +2,15 @@ package service
 
 import (
 	"beet_pos/dto"
+	"beet_pos/entity"
 	"beet_pos/repository"
-	"beet_pos/structs"
 	"log"
 
 	"github.com/mashingan/smapping"
 )
 
 type CustomerService interface {
-	RegisterCustomer(customer dto.RegisterCustomerDTO) structs.Customer
+	RegisterCustomer(customer dto.RegisterCustomerDTO) entity.Customer
 	IsDuplicate(customer_phone string)bool
 }
 
@@ -25,8 +25,8 @@ func NewAuthService(customerRep repository.CustomerRepository) CustomerService{
 	}
 }
 
-func (service *customerService) RegisterCustomer(customer dto.RegisterCustomerDTO) structs.Customer{
-	customerToCreate := structs.Customer{}
+func (service *customerService) RegisterCustomer(customer dto.RegisterCustomerDTO) entity.Customer{
+	customerToCreate := entity.Customer{}
 	err := smapping.FillStruct(&customerToCreate, smapping.MapFields(&customer))
 	if err != nil{
 		log.Fatalf("Failed map %v",err)

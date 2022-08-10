@@ -30,4 +30,6 @@ type RegisterCustomerDTO struct{
 	Vehicle_number		string `json:"vehicle_number" form:"vehicle_number" binding:"required"`
 	Customer_point 		int32 `json:"customer_point" form:"customer_point" binding:"required"`
 	Customer_update		time.Time `json:"customer_update"`
+	Outlet_id			string `json:"outlet_id" form:"outlet_id,omitempty"`
+
 }

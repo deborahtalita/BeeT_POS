@@ -1,7 +1,7 @@
 package config
 
 import (
-	"beet_pos/structs"
+	"beet_pos/entity"
 	"fmt"
 	"os"
 
@@ -28,10 +28,16 @@ func SetUpDatabaseConnection() *gorm.DB{
 		panic("Failed to create a connection to database")
 	}
 	//model
-	db.AutoMigrate(&structs.Outlet{},&structs.Customer{})
-	db.Preload("Outlet").Find(&structs.Customer{})
+	db.AutoMigrate(&entity.Outlet{}, &entity.Customer{})
+	// db.Preload("Outlet").Find(&structs.Customer{})
 	return db
 }
+
+// func GetAll(db *gorm.DB) ([]structs.Customer, error) {
+//     var customer []structs.Customer
+//     err := db.Model(&structs.Customer{}).Preload("Outlet_id").Find(&customer).Error
+//     return customer, err
+// }
 
 //CloseConnectionDatabase method untuk menutup koneksi ke database
 func CloseConnectionDatabase(db *gorm.DB) {
