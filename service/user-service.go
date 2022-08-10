@@ -27,9 +27,9 @@ func (svc *userService) VerifyCredential(username string, password string, outle
 	log.Printf("UserService : VerifyCredential")
 	res := svc.userRepository.VerifyCredential(username, password)
 	if v, ok := res.(entity.User); ok {
-		comparedPassword := comparePassword(v.Password, []byte(password))
-		if v.Username == username && comparedPassword {
-			if v.Outlet_ID == outlet_id {
+		comparedPassword := comparePassword(v.User_password, []byte(password))
+		if v.User_name == username && comparedPassword {
+			if v.Outlet_id == outlet_id {
 				return res
 			}
 		}

@@ -14,7 +14,8 @@ func SetupDatabaseConnection() *gorm.DB {
 		panic("Failed to create a connection to database")
 	}
 
-	db.AutoMigrate((&entity.User{}))
+	db.AutoMigrate(&entity.User{}, &entity.Customer{}, &entity.Outlet{})
+	//db.Preload("Outlet").Find(&entity.Customer{})
 	return db
 }
 
