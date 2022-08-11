@@ -46,6 +46,7 @@ func (c *customerController) Register(ctx *gin.Context){
 			ctx.JSON(http.StatusConflict, response)
 		}else{
 			createdUser := c.customerService.RegisterCustomer(registerCustomerDTO)
+			log.Printf(createdUser.Outlet_id)
 			response := helper.BuildResponse(true, "OK!", createdUser)
 			ctx.JSON(http.StatusCreated, response)
 		}

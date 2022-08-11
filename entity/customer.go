@@ -15,6 +15,6 @@ type Customer struct {
 	// Vehicle_number   string    `gorm:"type:varchar(64)" json:"vehicle_number"`
 	// Customer_point   int32     `gorm:"type:int(11)" json:"customer_point"`
 	Customer_update  time.Time `gorm:"type:datetime" json:"customer_update"`
-	Outlet        Outlet  `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
-	//Outlet		Outlet	`json:"-"`	
+	//Outlet        Outlet  `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	Outlet_id			string	`gorm:"type:varchar(64)" json:"outlet_id"`	
 }

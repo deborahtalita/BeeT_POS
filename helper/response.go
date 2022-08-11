@@ -3,7 +3,7 @@ package helper
 type Response struct {
 	Status 		bool 		`json:"status"`
 	Message		string 		`json:"msg"`
-	Errors		interface{}	`json:"errors"`
+	Errors		interface{}	`json:"errors,omitempty"`
 	Data		interface{}	`json:"data"`
 }
 
