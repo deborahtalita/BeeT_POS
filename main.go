@@ -3,6 +3,7 @@ package main
 import (
 	"beet_pos/config"
 	"beet_pos/controller"
+	"beet_pos/middleware"
 	"beet_pos/repository"
 	"beet_pos/service"
 	"log"
@@ -28,12 +29,17 @@ var (
 func main() {
 	router := gin.Default()
 
-	customerRoutes := router.Group("api/customer")
+	customerRoutes := router.Group("api/customer",middleware.AuthorizeJWT(jwtService))
 	{
 		customerRoutes.POST("/register",customerController.Register)
 	}
-	router.POST("/api/products", productController.AddProduct)
-	router.PUT("/api/products")
+	productRoutes := router.Group("api/products",middleware.AuthorizeJWT(jwtService))
+	{
+		productRoutes.POST("/", productController.AddProduct)
+		productRoutes.GET("/", productController.GetAllProds)
+		productRoutes.PATCH("/:product_id", productController.Update)
+		productRoutes.PATCH("/delete/:product_id",productController.Delete)
+	}
 	router.POST("/login", userController.Login)
 	log.Fatal(router.Run(":8080"))
 	

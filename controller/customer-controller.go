@@ -60,7 +60,7 @@ func (c *customerController) getOutletIDByToken(token string) string {
 		panic(err.Error())
 	}
 	claims := jToken.Claims.(jwt.MapClaims)
-	outlet_id := fmt.Sprintf("%v", claims["Outlet_ID"])
+	outlet_id := fmt.Sprintf("%v", claims["Outlet_id"])
 	log.Printf(outlet_id)
 	return outlet_id
 }
