@@ -16,7 +16,7 @@ type ProductRepository interface {
 	Update(id string, product entity.Product) entity.Product
 	Delete(id string)
 	GetAll() ([]entity.Product, error)
-	GetAllPaginate(pagination dto.Pagination) dto.Pagination
+	GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination
 }
 
 type productConnection struct {
@@ -68,7 +68,7 @@ func (db *productConnection) GetAll() ([]entity.Product, error) {
 }
 
 // GetAllPaginate implements ProductRepository
-func (db *productConnection) GetAllPaginate(pagination dto.Pagination) dto.Pagination{
+func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination{
 	var pgn dto.Pagination
 
 	totRows, totalPages, fromRow, toRow := 0, 0, 0, 0
@@ -79,7 +79,7 @@ func (db *productConnection) GetAllPaginate(pagination dto.Pagination) dto.Pagin
 	// get data with limit, offset, and order
 	var product entity.Product
 	var products []entity.Product
-	find := db.connection.Limit(pagination.Limit).Offset(offset).Preload("Outlet")
+	find := db.connection.Limit(pagination.Limit).Offset(offset).Where("outlet_id = ?", outlet_id).Preload("Outlet")
 
 	find = find.Find(&products)
 
@@ -94,7 +94,7 @@ func (db *productConnection) GetAllPaginate(pagination dto.Pagination) dto.Pagin
 	pagination.Rows = products
 
 	// count all data
-	errCount := db.connection.Model(product).Count(&totalRows).Error
+	errCount := db.connection.Model(product).Where("outlet_id = ?", outlet_id).Count(&totalRows).Error
 
 	if errCount != nil {
 		fmt.Printf("[ProductRepo.GetAll] error execute query %v \n", errCount)
@@ -126,7 +126,7 @@ func (db *productConnection) GetAllPaginate(pagination dto.Pagination) dto.Pagin
 	}
 
 	pagination.FromRow = fromRow
-	fmt.Printf("fromrow: %d \n",fromRow)
+	fmt.Printf("totalrow: %d \n",totalRows)
 	pagination.ToRow = toRow
 
 	return pagination

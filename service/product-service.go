@@ -14,7 +14,7 @@ type ProductService interface {
 	Update(id string, product dto.UpdateProductDTO) entity.Product
 	Delete(id string)
 	GetAll() ([]entity.Product, error)
-	GetAllPaginate(p dto.Pagination) dto.Pagination
+	GetAllPaginate(outlet_id string, p dto.Pagination) dto.Pagination
 }
 
 type productService struct {
@@ -58,6 +58,6 @@ func (svc *productService) GetAll() ([]entity.Product, error) {
 }
 
 // GetAllPaginate implements ProductService
-func (svc *productService) GetAllPaginate(p dto.Pagination) dto.Pagination {
-	return svc.productRepository.GetAllPaginate(p)
+func (svc *productService) GetAllPaginate(outlet_id string, p dto.Pagination) dto.Pagination {
+	return svc.productRepository.GetAllPaginate(outlet_id, p)
 }

@@ -9,8 +9,8 @@ type Product struct {
 	Product_type   	string 	 	`gorm:"type:varchar(64)" json:"product_type"`
 	Product_status	bool		`gorm:"type:bool;default:true" json:"product_status"`
 	//Product_update 	time.Time 	`gorm:"type:datetime" json:"product_update"`
-	Outlet_id		string		`gorm:"type:varchar(64)" json:"outlet_id"`	
+	Outlet_id		string		`gorm:"not null" json:"-"`	
 	Category_id		string		`gorm:"type:varchar(64)" json:"category_id"`	
 	Subcategory_id	string		`gorm:"type:varchar(64)" json:"subcategory_id"`	
-	//Outlet			Outlet		`gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	Outlet			Outlet		`json:"outlet"`
 }

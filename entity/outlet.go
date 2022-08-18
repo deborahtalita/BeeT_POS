@@ -16,6 +16,6 @@ type Outlet struct {
 	// Outlet_created time.Time `gorm:"type:datetime" json:"outlet_created"`
 	// Outlet_update  time.Time `gorm:"type:datetime" json:"outlet_update"`
 	//Customers	   []Customer `json:"customers,omitempty"`
-	Customers	   []Customer `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
-	Products	   []Product  `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	//Customers	   []Customer `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	//Products	   []Product  `json:"-"`
 }

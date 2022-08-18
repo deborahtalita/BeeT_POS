@@ -78,11 +78,6 @@ func (c *productController) Update(ctx *gin.Context) {
 func (c *productController) Delete(ctx *gin.Context) {
 	id := ctx.Param("product_id")
 
-	authHeader := ctx.GetHeader("Authorization")
-	_, errToken := c.jwtService.ValidateToken(authHeader)
-	if errToken != nil {
-		panic(errToken.Error())
-	}
 	c.productService.Delete(id)
 	res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
 	ctx.JSON(http.StatusOK, res)
@@ -99,7 +94,14 @@ func (c *productController) GetAll(ctx *gin.Context) {
 
 func (c *productController) GetAllProds(ctx *gin.Context){
 	pagination := helper.GeneratePagination(ctx)
-	products := c.productService.GetAllPaginate(*pagination)
+	authHeader := ctx.GetHeader("Authorization")
+		token, err := c.jwtService.ValidateToken(authHeader)
+		if err != nil {
+			panic(err.Error())
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		outletID := fmt.Sprintf("%v", claims["Outlet_id"])
+	products := c.productService.GetAllPaginate(outletID, *pagination)
 	res := helper.BuildResponse(true, "OK", products)
 	ctx.JSON(http.StatusOK, res)
 }
