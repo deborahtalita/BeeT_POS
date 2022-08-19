@@ -18,9 +18,10 @@ type (
 
 	// RefreshTokenCustomClaims specifies the claims for refresh token
 	RefreshTokenCustomClaims struct {
-		UserData  string
-		CustomKey string
-		KeyType   string
+		Username string
+		Role      string
+		Outlet_id string
+		KeyType string
 		jwt.StandardClaims
 	}
 
@@ -36,8 +37,10 @@ type (
 
 type JWTService interface {
 	GenerateAccessToken(userData entity.User) string
-	//GenerateRefreshToken
+	GenerateRefreshToken(userData entity.User) string
 	ValidateToken(token string) (*jwt.Token, error)
+	ValidateRefreshToken(token string) (*jwt.Token, error)
+	Refresh(token string) (*jwt.Token, error)
 }
 
 type jwtService struct {
@@ -62,7 +65,30 @@ func (js *jwtService) GenerateAccessToken(userData entity.User) string {
 		v.Outlet_id,
 		"access",
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().AddDate(1, 0, 0).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 24 * 3).Unix(),
+			Issuer:    js.issuer,
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	t, err := token.SignedString([]byte(js.secretKey))
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// GenerateRefreshToken implements JWTService
+func (js *jwtService) GenerateRefreshToken(userData entity.User) string {
+	log.Printf("JWTService : GenerateRefreshToken")
+
+	v := userData
+	claims := &RefreshTokenCustomClaims{
+		v.User_name,
+		v.User_role,
+		v.Outlet_id,
+		"refresh",
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24 * 14).Unix(),
 			Issuer:    js.issuer,
 		},
 	}
@@ -82,4 +108,20 @@ func (js *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 		}
 		return []byte(js.secretKey), nil
 	})
+}
+
+// ValidateRefreshToken implements JWTService
+func (js *jwtService) ValidateRefreshToken(token string) (*jwt.Token, error) {
+	return jwt.Parse(token, func(t_ *jwt.Token) (interface{}, error) {
+		if _, ok := t_.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method %v", t_.Header["alg"])
+		}
+		return []byte(js.secretKey), nil
+	})
+}
+
+// Refresh implements JWTService
+func (js *jwtService) Refresh(token string) (*jwt.Token, error) {
+	return js.ValidateRefreshToken(token)
+
 }

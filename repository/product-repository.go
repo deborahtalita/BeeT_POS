@@ -15,14 +15,15 @@ type ProductRepository interface {
 	AddProduct(product entity.Product) entity.Product
 	Update(id string, product entity.Product) entity.Product
 	Delete(id string)
+	FindByID(id string) entity.Product
 	GetAll() ([]entity.Product, error)
 	GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination
+	AddVariant(variant entity.Product_variant, id string) entity.Product_variant
 }
 
 type productConnection struct {
 	connection *gorm.DB
 }
-
 func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &productConnection{
 		connection: db,
@@ -33,6 +34,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 func (db *productConnection) AddProduct(product entity.Product) entity.Product {
 	//product.Product_update = time.Now()
 	db.connection.Save(&product)
+	db.connection.Preload("Outlet").Find(&product)
 	return product
 }
 
@@ -40,12 +42,11 @@ func (db *productConnection) Update(id string, product entity.Product) entity.Pr
 	//product.Product_update = time.Now()
 	var upProduct = entity.Product{}
 	err := db.connection.Table("products").Where("product_id = ?", id).First(&upProduct).Updates(&product).Error
+	// tambah preload
 	if err != nil {
 		fmt.Printf("[ProductRepo.Update] error execute query %v \n", err)
 		//return nil
 	}
-	// db.connection.Save(&product)
-	// db.connection.Model(&product).Updates()
 	return product
 }
 
@@ -68,7 +69,7 @@ func (db *productConnection) GetAll() ([]entity.Product, error) {
 }
 
 // GetAllPaginate implements ProductRepository
-func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination{
+func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination {
 	var pgn dto.Pagination
 
 	totRows, totalPages, fromRow, toRow := 0, 0, 0, 0
@@ -106,7 +107,7 @@ func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pag
 	//calculate total pages
 
 	totalPages = int(math.Ceil(float64(totalRows)/float64(pagination.Limit))) - 1
-	fmt.Printf("totalpages: %d \n",totalPages)
+	fmt.Printf("totalpages: %d \n", totalPages)
 
 	if pagination.Page == 0 {
 		// set from & to row on first page
@@ -126,8 +127,23 @@ func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pag
 	}
 
 	pagination.FromRow = fromRow
-	fmt.Printf("totalrow: %d \n",totalRows)
+	fmt.Printf("totalrow: %d \n", totalRows)
 	pagination.ToRow = toRow
 
 	return pagination
+}
+
+// FindByID implements ProductRepository
+func (db *productConnection) FindByID(id string) entity.Product {
+	var product entity.Product
+	db.connection.Where("product_id = ?", id).Preload("Outlet").Find(&product)
+	return product
+}
+
+func (db *productConnection) AddVariant(variant entity.Product_variant, id string) entity.Product_variant {
+	db.connection.Save(&variant)
+	fmt.Printf("db 1 %d",variant.Product_id)
+	db.connection.Find(&variant)
+	fmt.Printf("svc %d",variant.Product_id)
+	return variant
 }

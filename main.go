@@ -37,10 +37,16 @@ func main() {
 	{
 		productRoutes.POST("/", productController.AddProduct)
 		productRoutes.GET("/", productController.GetAllProds)
+		productRoutes.GET("/:product_id", productController.GetProductByID)
 		productRoutes.PATCH("/:product_id", productController.Update)
 		productRoutes.PATCH("/delete/:product_id",productController.Delete)
 	}
+	productVariantRoutes := router.Group("api/productvariants",middleware.AuthorizeJWT(jwtService))
+	{
+		productVariantRoutes.POST("/:product_id", productController.AddVariant)
+	}
 	router.POST("/login", userController.Login)
+	router.POST("/auth/refresh",middleware.AuthorizeJWT(jwtService),userController.Refresh)
 	log.Fatal(router.Run(":8080"))
 	
 	router.Run()

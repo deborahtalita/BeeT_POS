@@ -16,8 +16,10 @@ type ProductController interface {
 	AddProduct(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	GetProductByID(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
 	GetAllProds(ctx *gin.Context)
+	AddVariant(ctx *gin.Context)
 }
 
 type productController struct {
@@ -92,16 +94,44 @@ func (c *productController) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (c *productController) GetAllProds(ctx *gin.Context){
+func (c *productController) GetAllProds(ctx *gin.Context) {
 	pagination := helper.GeneratePagination(ctx)
 	authHeader := ctx.GetHeader("Authorization")
-		token, err := c.jwtService.ValidateToken(authHeader)
-		if err != nil {
-			panic(err.Error())
-		}
-		claims := token.Claims.(jwt.MapClaims)
-		outletID := fmt.Sprintf("%v", claims["Outlet_id"])
+	token, err := c.jwtService.ValidateToken(authHeader)
+	if err != nil {
+		panic(err.Error())
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	outletID := fmt.Sprintf("%v", claims["Outlet_id"])
 	products := c.productService.GetAllPaginate(outletID, *pagination)
 	res := helper.BuildResponse(true, "OK", products)
 	ctx.JSON(http.StatusOK, res)
+}
+
+// GetProductByID implements ProductController
+func (c *productController) GetProductByID(ctx *gin.Context) {
+	id := ctx.Param("product_id")
+	product := c.productService.FindByID(id)
+	// if (entity.Product{} == product) {
+	// 	res := helper.BuildErrorResponse("Data not found", "No data with given id", helper.EmptyObj{})
+	// 	ctx.JSON(http.StatusNotFound, res)
+	// } else {
+		res := helper.BuildResponse(true, "OK", product)
+		ctx.JSON(http.StatusOK, res)
+	// }
+}
+
+func (c *productController) AddVariant(ctx *gin.Context) {
+	var addVariantDTO dto.AddVariantDTO
+	errDTO := ctx.ShouldBind(&addVariantDTO)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	} else {
+		id := ctx.Param("product_id")
+		createdProdVariant := c.productService.AddVariant(addVariantDTO, id)
+		response := helper.BuildResponse(true, "OK!", createdProdVariant)
+		ctx.JSON(http.StatusCreated, response)
+	}
 }
