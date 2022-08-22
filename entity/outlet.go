@@ -15,5 +15,5 @@ type Outlet struct {
 	Outlet_status 	string `gorm:"type:varchar(32)" json:"outlet_status"`
 	Outlet_created 	string `gorm:"type:varchar(55)" json:"outlet_created"`
 	Outlet_update 	string `gorm:"type:varchar(55)" json:"outlet_update"`
-	Customers	   []Customer `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	//Customers	   []Customer `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
 }

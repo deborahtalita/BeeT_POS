@@ -113,7 +113,7 @@ func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pag
 		}
 	}
 
-	find = find.Preload("Outlet").Find(&products)
+	find = find.Preload("Product_discounts").Preload("Product_variants").Find(&products)
 
 	// has error find data
 	errFind := find.Error

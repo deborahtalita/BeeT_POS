@@ -10,7 +10,7 @@ type AddProductDTO struct {
 	//Product_status bool		 `json:"product_status"`
 	Product_update time.Time `json:"product_update"`
 	Outlet_id		string	 `json:"outlet_id"`	
-	Category_id		string	 `json:"category_id" binding:"required"`	
+	Category_id		string	 `json:"category_id"`	
 	Subcategory_id	string 	 `json:"subcategory_id"`	
 }
 
