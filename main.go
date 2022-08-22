@@ -45,6 +45,11 @@ func main() {
 	{
 		productVariantRoutes.POST("/:product_id", productController.AddVariant)
 	}
+
+	productDiscountRoutes := router.Group("api/productdiscounts",middleware.AuthorizeJWT(jwtService))
+	{
+		productDiscountRoutes.POST("/:product_id", productController.AddDiscount)
+	}
 	router.POST("/login", userController.Login)
 	router.POST("/auth/refresh",middleware.AuthorizeJWT(jwtService),userController.Refresh)
 	log.Fatal(router.Run(":8080"))

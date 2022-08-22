@@ -20,6 +20,7 @@ type ProductController interface {
 	GetAll(ctx *gin.Context)
 	GetAllProds(ctx *gin.Context)
 	AddVariant(ctx *gin.Context)
+	AddDiscount(ctx *gin.Context)
 }
 
 type productController struct {
@@ -132,6 +133,21 @@ func (c *productController) AddVariant(ctx *gin.Context) {
 		id := ctx.Param("product_id")
 		createdProdVariant := c.productService.AddVariant(addVariantDTO, id)
 		response := helper.BuildResponse(true, "OK!", createdProdVariant)
+		ctx.JSON(http.StatusCreated, response)
+	}
+}
+
+func (c *productController) AddDiscount(ctx *gin.Context) {
+	var addDiscountDTO dto.AddDiscountDTO
+	errDTO := ctx.ShouldBind(&addDiscountDTO)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	} else {
+		id := ctx.Param("product_id")
+		createdProdDiscount := c.productService.AddDiscount(addDiscountDTO, id)
+		response := helper.BuildResponse(true, "OK!", createdProdDiscount)
 		ctx.JSON(http.StatusCreated, response)
 	}
 }

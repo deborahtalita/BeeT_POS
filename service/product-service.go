@@ -18,6 +18,7 @@ type ProductService interface {
 	GetAll() ([]entity.Product, error)
 	GetAllPaginate(outlet_id string, p dto.Pagination) dto.Pagination
 	AddVariant(variant dto.AddVariantDTO, id string) entity.Product_variant
+	AddDiscount(discount dto.AddDiscountDTO, id string) entity.Product_discount
 }
 
 type productService struct {
@@ -81,5 +82,17 @@ func (svc *productService) AddVariant(variant dto.AddVariantDTO, id string) enti
 	variantToCreate.Product_id = id
 	fmt.Printf("svc %d",variantToCreate.Product_id)
 	res := svc.productRepository.AddVariant(variantToCreate, id)
+	return res
+}
+
+func (svc *productService) AddDiscount(discount dto.AddDiscountDTO, id string) entity.Product_discount {
+	discToCreate := entity.Product_discount{}
+
+	err := smapping.FillStruct(&discToCreate, smapping.MapFields(&discount))
+	if err != nil {
+		log.Fatalf("Failed map %v", err)
+	}
+	discToCreate.Product_id = id
+	res := svc.productRepository.AddDiscount(discToCreate, id)
 	return res
 }

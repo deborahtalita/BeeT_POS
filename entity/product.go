@@ -13,4 +13,5 @@ type Product struct {
 	Category_id		string		`gorm:"type:varchar(64)" json:"category_id"`	
 	Subcategory_id	string		`gorm:"type:varchar(64)" json:"subcategory_id"`	
 	Outlet			Outlet		`json:"outlet"`
+	//Product_variants	    []Product_variant `gorm:"foreignKey:Product_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"product_variant"`
 }

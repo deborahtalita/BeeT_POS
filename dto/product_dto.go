@@ -22,12 +22,20 @@ type UpdateProductDTO struct {
 }
 
 type AddVariantDTO struct {
-	Variant_id     uint64 		`gorm:"autoIncrement;primary_key;type:int" json:"variant_id"`
-	Variant_name   string 		`gorm:"type:varchar(64)" json:"variant_name" binding:"required"`
-	Sell_price     uint64 		`gorm:"type:int" json:"sell_price" binding:"required"`
-	Purchase_price uint64 		`gorm:"type:int" json:"purchase_price" binding:"required"`
-	Stock          uint64 		`gorm:"type:int" json:"stock" binding:"required"`
-	Created_time   time.Time	`gorm:"type:datetime" json:"created_time"`
-	Updated_time   time.Time	`gorm:"type:datetime" json:"updated_time"`
-	Product_id		string		`gorm:"not null" json:"-"`
+	Variant_id     uint64 		`json:"variant_id" binding:"required"`
+	Variant_name   string 		`json:"variant_name" binding:"required"`
+	Sell_price     uint64 		`json:"sell_price" binding:"required"`
+	Purchase_price uint64 		`json:"purchase_price" binding:"required"`
+	Stock          uint64 		`json:"stock" binding:"required"`
+	Created_time   time.Time	`json:"created_time"`
+	Updated_time   time.Time	`json:"updated_time"`
+	Product_id		string		`json:"-"`
+}
+
+type AddDiscountDTO struct {
+	Discount_id		uint64		`json:"discount_id" binding:"required"`
+	Discount_name	string		`json:"discount_name" binding:"required"`
+	Discount_type	string		`json:"discount_type"`
+	Discount_value	float64		`json:"discount_value" binding:"required"`
+	Product_id		string		`json:"-"`
 }

@@ -5,6 +5,7 @@ import (
 	"beet_pos/entity"
 	"fmt"
 	"math"
+	"strings"
 
 	//"time"
 
@@ -19,11 +20,14 @@ type ProductRepository interface {
 	GetAll() ([]entity.Product, error)
 	GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination
 	AddVariant(variant entity.Product_variant, id string) entity.Product_variant
+	AddDiscount(discount entity.Product_discount, id string) entity.Product_discount
+	//AddPicture(picture entity.Product_picture, id string) entity.Product_picture
 }
 
 type productConnection struct {
 	connection *gorm.DB
 }
+
 func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &productConnection{
 		connection: db,
@@ -80,9 +84,36 @@ func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pag
 	// get data with limit, offset, and order
 	var product entity.Product
 	var products []entity.Product
-	find := db.connection.Limit(pagination.Limit).Offset(offset).Where("outlet_id = ?", outlet_id).Preload("Outlet")
+	find := db.connection.Limit(pagination.Limit).Offset(offset).Where("outlet_id = ?", outlet_id)
 
-	find = find.Find(&products)
+	// generate where query
+	searchs := pagination.Searchs
+
+	if searchs != nil {
+		for _, value := range searchs {
+			column := value.Column
+			action := value.Action
+			query := value.Query
+
+			switch action {
+				case "equals":
+					whereQuery := fmt.Sprintf("%s = ?", column)
+					find = find.Where(whereQuery, query)
+					break
+				case "contains":
+					whereQuery := fmt.Sprintf("%s LIKE ?", column)
+					find = find.Where(whereQuery, "%"+query+"%")
+					break
+				case "in":
+					whereQuery := fmt.Sprintf("%s IN (?)", column)
+					queryArray := strings.Split(query, ",")
+					find = find.Where(whereQuery, queryArray)
+					break
+			}
+		}
+	}
+
+	find = find.Preload("Outlet").Find(&products)
 
 	// has error find data
 	errFind := find.Error
@@ -142,8 +173,14 @@ func (db *productConnection) FindByID(id string) entity.Product {
 
 func (db *productConnection) AddVariant(variant entity.Product_variant, id string) entity.Product_variant {
 	db.connection.Save(&variant)
-	fmt.Printf("db 1 %d",variant.Product_id)
-	db.connection.Find(&variant)
-	fmt.Printf("svc %d",variant.Product_id)
+	//fmt.Printf("db 1 %d",variant.Product_id)
+	//db.connection.Find(&variant)
+	//fmt.Printf("svc %d",variant.Product_id)
 	return variant
+}
+
+// AddDiscount implements ProductRepository
+func (db *productConnection) AddDiscount(discount entity.Product_discount, id string) entity.Product_discount {
+	db.connection.Save(&discount)
+	return discount
 }
