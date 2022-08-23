@@ -18,5 +18,5 @@ type Outlet struct {
 	Outlet_created 	string `gorm:"type:varchar(55)" json:"outlet_created"`
 	Outlet_update 	string `gorm:"type:varchar(55)" json:"outlet_update"`
 	// User_id			string `gorm:"type:varchar(64)" json:"user_id"`	
-	// User	   		User  `gorm:"primary_key" json:"user"`
+	User	   		User  `json:"user"`
 }

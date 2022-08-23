@@ -18,7 +18,6 @@ var (
 	customerRepository	repository.CustomerRepository	= repository.NewCustomerRepository(db)
 	productRepository	repository.ProductRepository	= repository.NewProductRepository(db)
 	OutletRepository 	repository.OutletRepository 	= repository.NewOutletRepository(db)
-
 	userService		service.UserService		= service.NewUserService(userRepository)
 	customerService 	service.CustomerService		= service.NewAuthService(customerRepository)
 	productService		service.ProductService		= service.NewProductService(productRepository)

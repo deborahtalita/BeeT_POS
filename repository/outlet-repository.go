@@ -209,7 +209,7 @@ func (db *outletConnection) GetPaginateFiltering(pagination dto.Pagination) dto.
 		}
 	}
 
-	find = find.Preload("Users").Find(&outlets)
+	find = find.Preload("User").Find(&outlets)
 
 	// has error find data
 	errFind := find.Error
