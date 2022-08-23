@@ -16,12 +16,12 @@ type ProductRepository interface {
 	AddProduct(product entity.Product) entity.Product
 	Update(id string, product entity.Product) entity.Product
 	Delete(id string)
-	FindByID(id string) entity.Product
+	FindByID(id string) (entity.Product, error)
 	GetAll() ([]entity.Product, error)
 	GetAllPaginate(outlet_id string, pagination dto.Pagination) dto.Pagination
 	AddVariant(variant entity.Product_variant, id string) entity.Product_variant
 	AddDiscount(discount entity.Product_discount, id string) entity.Product_discount
-	//AddPicture(picture entity.Product_picture, id string) entity.Product_picture
+	AddPicture(picture entity.Product_picture, id string) entity.Product_picture
 }
 
 type productConnection struct {
@@ -165,17 +165,18 @@ func (db *productConnection) GetAllPaginate(outlet_id string, pagination dto.Pag
 }
 
 // FindByID implements ProductRepository
-func (db *productConnection) FindByID(id string) entity.Product {
+func (db *productConnection) FindByID(id string) (entity.Product, error) {
 	var product entity.Product
-	db.connection.Where("product_id = ?", id).Preload("Outlet").Find(&product)
-	return product
+	err := db.connection.Where("product_id = ?", id).Preload("Product_discounts").Preload("Product_variants").First(&product).Error
+	if err != nil {
+		fmt.Printf("[ProductRepo.FindByID] error execute query %v \n", err)
+		return product, err
+	}
+	return product, nil
 }
 
 func (db *productConnection) AddVariant(variant entity.Product_variant, id string) entity.Product_variant {
 	db.connection.Save(&variant)
-	//fmt.Printf("db 1 %d",variant.Product_id)
-	//db.connection.Find(&variant)
-	//fmt.Printf("svc %d",variant.Product_id)
 	return variant
 }
 
@@ -183,4 +184,9 @@ func (db *productConnection) AddVariant(variant entity.Product_variant, id strin
 func (db *productConnection) AddDiscount(discount entity.Product_discount, id string) entity.Product_discount {
 	db.connection.Save(&discount)
 	return discount
+}
+
+func (db *productConnection) AddPicture(picture entity.Product_picture, id string) entity.Product_picture {
+	db.connection.Save(&picture)
+	return picture
 }

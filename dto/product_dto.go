@@ -39,3 +39,11 @@ type AddDiscountDTO struct {
 	Discount_value	float64		`json:"discount_value" binding:"required"`
 	Product_id		string		`json:"-"`
 }
+
+type AddPictureDTO struct {
+	Picture_id   string 	`json:"picture_id" binding:"required"`
+	Filename     string 	`json:"filename" binding:"required"`
+	Filepath     string 	`json:"filepath" binding:"required"`
+	Product_id		string		`json:"-"`
+	//Created_time time.Time	`gorm:"type:datetime" json:"created_time"`
+}

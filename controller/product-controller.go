@@ -21,6 +21,7 @@ type ProductController interface {
 	GetAllProds(ctx *gin.Context)
 	AddVariant(ctx *gin.Context)
 	AddDiscount(ctx *gin.Context)
+	AddPicture(ctx *gin.Context)
 }
 
 type productController struct {
@@ -48,6 +49,12 @@ func (c *productController) AddProduct(ctx *gin.Context) {
 		if err != nil {
 			panic(err.Error())
 		}
+		_, err = c.productService.FindByID(addProductDTO.Product_id)
+		if err == nil {
+		res := helper.BuildErrorResponse("Product ID already exixts","",helper.EmptyObj{})
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+		} 
 		claims := token.Claims.(jwt.MapClaims)
 		outletID := fmt.Sprintf("%v", claims["Outlet_id"])
 		log.Printf(outletID)
@@ -73,6 +80,12 @@ func (c *productController) Update(ctx *gin.Context) {
 	if errToken != nil {
 		panic(errToken.Error())
 	}
+	_, err := c.productService.FindByID(id)
+		if err != nil {
+		res := helper.BuildErrorResponse("Product ID not found",err.Error(),helper.EmptyObj{})
+		ctx.JSON(http.StatusNotFound, res)
+		return
+		} 
 	res := c.productService.Update(id, productUpdateDTO)
 	response := helper.BuildResponse(true, "Update successful!", res)
 	ctx.JSON(http.StatusOK, response)
@@ -112,14 +125,14 @@ func (c *productController) GetAllProds(ctx *gin.Context) {
 // GetProductByID implements ProductController
 func (c *productController) GetProductByID(ctx *gin.Context) {
 	id := ctx.Param("product_id")
-	product := c.productService.FindByID(id)
-	// if (entity.Product{} == product) {
-	// 	res := helper.BuildErrorResponse("Data not found", "No data with given id", helper.EmptyObj{})
-	// 	ctx.JSON(http.StatusNotFound, res)
-	// } else {
-		res := helper.BuildResponse(true, "OK", product)
-		ctx.JSON(http.StatusOK, res)
-	// }
+	product, err := c.productService.FindByID(id)
+	if err != nil {
+		res := helper.BuildErrorResponse("Product ID not found",err.Error(),helper.EmptyObj{})
+		ctx.JSON(http.StatusNotFound, res)
+		return
+	} 
+	res := helper.BuildResponse(true, "OK", product)
+	ctx.JSON(http.StatusOK, res)
 }
 
 func (c *productController) AddVariant(ctx *gin.Context) {
@@ -148,6 +161,21 @@ func (c *productController) AddDiscount(ctx *gin.Context) {
 		id := ctx.Param("product_id")
 		createdProdDiscount := c.productService.AddDiscount(addDiscountDTO, id)
 		response := helper.BuildResponse(true, "OK!", createdProdDiscount)
+		ctx.JSON(http.StatusCreated, response)
+	}
+}
+
+func (c *productController) AddPicture(ctx *gin.Context) {
+	var addPictureDTO dto.AddPictureDTO
+	errDTO := ctx.ShouldBind(&addPictureDTO)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	} else {
+		id := ctx.Param("product_id")
+		createdProductPict := c.productService.AddPicture(addPictureDTO, id)
+		response := helper.BuildResponse(true, "OK!", createdProductPict)
 		ctx.JSON(http.StatusCreated, response)
 	}
 }

@@ -50,6 +50,10 @@ func main() {
 	{
 		productDiscountRoutes.POST("/:product_id", productController.AddDiscount)
 	}
+	productPictureRoutes := router.Group("api/productpictures",middleware.AuthorizeJWT(jwtService))
+	{
+		productPictureRoutes.POST("/:product_id",productController.AddPicture)
+	}
 	router.POST("/login", userController.Login)
 	router.POST("/auth/refresh",middleware.AuthorizeJWT(jwtService),userController.Refresh)
 	log.Fatal(router.Run(":8080"))
