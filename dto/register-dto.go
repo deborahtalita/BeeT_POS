@@ -5,20 +5,19 @@ import (
 )
 
 type RegisterUserDTO struct {
-	User_id     string `json:"user_id" form:"user_id" binding:"required"`
+	User_id     uint64 `json:"user_id" form:"user_id" binding:"required"`
 	User_name    string `json:"user_name" form:"user_name" binding:"required,email"`
 	User_fullname string `json:"user_fullname" form:"user_fullname" binding:"required"`
-	User_email string `json:"user_email" form:"user_email" binding:"required"`
+	// User_email string `json:"user_email" form:"user_email" binding:"required"`
 	User_password string `json:"user_password" form:"user_password" binding:"required"`
 	User_role string `json:"user_role" form:"user_role" binding:"required"`
-	User_status string `json:"user_status" form:"user_status" binding:"required"`
-	User_update time.Time `json:"user_update"`
-
-
+	// User_status string `json:"user_status" form:"user_status" binding:"required"`
+	// User_update time.Time `json:"user_update" form:"user_update"`
+	Outlet_id string `json:"outlet_id" form:"outlet_id"`
 }
 
 type RegisterCustomerDTO struct{
-	Customer_id     	string `json:"customer_id" form:"customer_id" binding:"required"`
+	Customer_id     	uint64 `json:"customer_id" form:"customer_id" binding:"required"`
 	Customer_name 		string `json:"customer_name" form:"customer_name" binding:"required"`
 	Customer_type 		string `json:"customer_type" form:"customer_type" binding:"required"`
 	Customer_address 	string `json:"customer_address" form:"customer_address" binding:"required"`

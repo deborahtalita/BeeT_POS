@@ -28,7 +28,7 @@ type (
 	AccessTokenCustomClaims struct {
 		Username  string
 		Role      string
-		Outlet_id string
+		// Outlet_id string
 		KeyType   string
 		jwt.StandardClaims
 	}
@@ -59,7 +59,7 @@ func (js *jwtService) GenerateAccessToken(userData entity.User) string {
 	claims := &AccessTokenCustomClaims{
 		v.User_name,
 		v.User_role,
-		v.Outlet_id,
+		// v.Outlet_id,
 		"access",
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().AddDate(1, 0, 0).Unix(),

@@ -11,6 +11,8 @@ import (
 type UserRepository interface {
 	VerifyCredential(username string, password string) interface{}
 	InsertUser(user entity.User) entity.User
+	IsDuplicate(username string) (tx *gorm.DB)
+	ReadUser() []entity.User
 }
 
 type userConnection struct {
@@ -41,6 +43,12 @@ func (db *userConnection) InsertUser(user entity.User) entity.User{
 
 }
 
+func (db *userConnection) ReadUser() []entity.User{
+	var user []entity.User
+	db.connection.Preload("Outlet").Find(&user)
+	return user
+}
+
 func hashAndSalt(pwd []byte) string{
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil{
@@ -48,4 +56,9 @@ func hashAndSalt(pwd []byte) string{
 		panic("Failed to hash password")
 	}
 	return string(hash)
+}
+
+func (db *userConnection) IsDuplicate(username string) (tx *gorm.DB){
+	var user entity.User
+	return db.connection.Where("user_name = ?", username).Take(&user)
 }

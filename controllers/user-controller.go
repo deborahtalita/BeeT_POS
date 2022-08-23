@@ -15,6 +15,8 @@ import (
 
 type UserController interface {
 	Login(ctx *gin.Context)
+	Register(ctx *gin.Context)
+	ReadUser(ctx *gin.Context)
 }
 
 type userController struct {
@@ -50,4 +52,39 @@ func (c *userController) Login(ctx *gin.Context) {
 	}
 	response := helper.BuildErrorResponse("Please check again your credential", "Invalid credential",helper.EmptyObj{})
 	ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+}
+
+func (c *userController) Register(ctx *gin.Context){
+	var registerDTO dto.RegisterUserDTO
+	errDTO := ctx.ShouldBind(&registerDTO)
+	if errDTO != nil{
+		response := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if !c.userService.IsDuplicate(registerDTO.User_name){
+		response := helper.BuildErrorResponse("Failed to process request", "Duplicate Email", helper.Response{})
+		ctx.JSON(http.StatusConflict, response)
+	}else{
+		createdUser := c.userService.CreateUser(registerDTO)
+		token := c.jwtService.GenerateAccessToken(createdUser)
+		createdUser.AccessToken = token
+		response := helper.BuildResponse(true, "OK!", createdUser)
+		ctx.JSON(http.StatusCreated, response)
+	}
+}
+
+func(c *userController) ReadUser(ctx *gin.Context){
+	authHeader := ctx.GetHeader("Authorization")
+		_, err := c.jwtService.ValidateToken(authHeader)
+		if err != nil {
+			panic(err.Error())
+		}
+	// 	claims := token.Claims.(jwt.MapClaims)
+	// 	outletID := fmt.Sprintf("%v", claims["outlet_id"])
+	// log.Printf(outletID)
+	user := c.userService.ReadUser()
+	res := helper.BuildResponse(true, "OK!", user)
+	ctx.JSON(http.StatusOK, res)
 }

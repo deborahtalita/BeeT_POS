@@ -3,6 +3,7 @@ package main
 import (
 	"beet_pos/config"
 	"beet_pos/controllers"
+	"beet_pos/middleware"
 	"beet_pos/repository"
 	"beet_pos/service"
 
@@ -19,9 +20,9 @@ var(
 	customerService 	service.CustomerService 		= service.NewAuthService(customerRepository)
 	outletService 		service.OutletService 			= service.NewOutletService(OutletRepository)
 	jwtService			service.JWTService				= service.NewJWTService()
-	customerController 	controllers.CustomerController 	= controllers.NewCustomerController(customerService,jwtService)
+	customerController 	controllers.CustomerController	= controllers.NewCustomerController(customerService,jwtService)
 	userController		controllers.UserController		= controllers.NewuserController(userService, jwtService)
-	outletController	controllers.OutletController	= controllers.NewOutletController(outletService)
+	outletController	controllers.OutletController	= controllers.NewOutletController(outletService, jwtService)
 )
 
 func main() {
@@ -32,9 +33,20 @@ func main() {
 	{
 		customerRoutes.POST("/register",customerController.Register)
 	}
-	outletRoutes := router.Group("api/outlet")
+	outletRoutes := router.Group("api/outlet", middleware.AuthorizeJWT(jwtService))
 	{
+		outletRoutes.GET("/", outletController.GetAllOutlets)
+		outletRoutes.GET("/filter", outletController.GetPaginateFiltering)
 		outletRoutes.POST("/create", outletController.CreateOutlet)
+		outletRoutes.GET("/read", outletController.ReadOutlet)
+		outletRoutes.PUT("/update",outletController.UpdateOutlet)
+		outletRoutes.GET("/read/:outlet_id", outletController.FindByID)
+		outletRoutes.PATCH("/delete/:outlet_id", outletController.DeleteOutlet)
+	}
+	userRouters := router.Group("api/user")
+	{
+		userRouters.POST("/create",userController.Register)
+		userRouters.GET("/", userController.ReadUser)
 	}
 	router.POST("/login", userController.Login)
 

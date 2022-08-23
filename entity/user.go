@@ -10,5 +10,6 @@ type User struct {
 	User_role		string	`json:"user_role"`
 	AccessToken    	string  `json:"access_token,omitempty"`
 	RefreshToken	string	`json:"refresh_token,omitempty"`
-	Outlet_id		string	`json:"outlet_id"`
+	Outlet_id		string	`gorm:"varchar(64);not null" json:"-"`
+	Outlet			[]Outlet `gorm:"foreignKey:User_id" json:"outlet"`
 }

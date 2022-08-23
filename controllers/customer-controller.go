@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type CustomerController interface {
 	Register(ctx *gin.Context)
 	getOutletIDByToken(token string) string
@@ -47,12 +46,12 @@ func (c *customerController) Register(ctx *gin.Context){
 			ctx.JSON(http.StatusConflict, response)
 		}else{
 			createdUser := c.customerService.RegisterCustomer(registerCustomerDTO)
+			log.Printf(createdUser.Outlet_id)
 			response := helper.BuildResponse(true, "OK!", createdUser)
 			ctx.JSON(http.StatusCreated, response)
 		}
 	}
 }
-
 
 func (c *customerController) getOutletIDByToken(token string) string {
 	log.Printf(token)
@@ -61,7 +60,7 @@ func (c *customerController) getOutletIDByToken(token string) string {
 		panic(err.Error())
 	}
 	claims := jToken.Claims.(jwt.MapClaims)
-	outlet_id := fmt.Sprintf("%v", claims["Outlet_ID"])
+	outlet_id := fmt.Sprintf("%v", claims["Outlet_id"])
 	log.Printf(outlet_id)
 	return outlet_id
 }
