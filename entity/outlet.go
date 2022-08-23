@@ -7,13 +7,16 @@ type Outlet struct {
 	Outlet_phone 	string `gorm:"type:varchar(16)" json:"outlet_phone"`
 	Outlet_address 	string `gorm:"type:varchar(64)" json:"outlet_address"`
 	City_code 		string `gorm:"type:varchar(13)" json:"city_code"`
-	Province_code 	string `gorm:"type:varchar(13)" json:"province_code"`
-	Outlet_manager	string `gorm:"type:varchar(64)" json:"outlet_manager"`
+	City_name 		string `gorm:"type:varchar(64)" json:"city_name"`
+	// Province_code 	string `gorm:"type:varchar(13)" json:"province_code"`
+	Province_name 	string `gorm:"type:varchar(64)" json:"province_name"`
+	User_id			uint64 `gorm:"type:int" json:"user_id"`
 	Outlet_link 	string `gorm:"type:varchar(1024)" json:"outlet_link"`
 	Outlet_ig 		string `gorm:"type:varchar(64)" json:"outlet_ig"`
-	Outlet_type 	string `gorm:"type:varchar(4)" json:"outlet_type"`
-	Outlet_status 	string `gorm:"type:varchar(32)" json:"outlet_status"`
+	Outlet_type 	string `gorm:"type:varchar(8)" json:"outlet_type"`
+	Outlet_status 	bool `gorm:"type:bool;default:true" json:"outlet_status"`
 	Outlet_created 	string `gorm:"type:varchar(55)" json:"outlet_created"`
 	Outlet_update 	string `gorm:"type:varchar(55)" json:"outlet_update"`
-	//Customers	   []Customer `gorm:"foreignKey:Outlet_id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"outlet"`
+	// User_id			string `gorm:"type:varchar(64)" json:"user_id"`	
+	// User	   		User  `gorm:"primary_key" json:"user"`
 }
