@@ -13,17 +13,22 @@ import (
 )
 
 var (
-	db 					*gorm.DB						= config.SetupDatabaseConnection()
-	userRepository		repository.UserRepository 		= repository.NewUserRepository(db)
+	db *gorm.DB	= config.SetupDatabaseConnection()
+	userRepository		repository.UserRepository 	= repository.NewUserRepository(db)
 	customerRepository	repository.CustomerRepository	= repository.NewCustomerRepository(db)
 	productRepository	repository.ProductRepository	= repository.NewProductRepository(db)
-	userService			service.UserService				= service.NewUserService(userRepository)
-	customerService 	service.CustomerService			= service.NewAuthService(customerRepository)
-	productService		service.ProductService			= service.NewProductService(productRepository)
-	jwtService			service.JWTService				= service.NewJWTService()
-	userController		controller.UserController		= controller.NewuserController(userService, jwtService)
+	OutletRepository 	repository.OutletRepository 	= repository.NewOutletRepository(db)
+
+	userService		service.UserService		= service.NewUserService(userRepository)
+	customerService 	service.CustomerService		= service.NewAuthService(customerRepository)
+	productService		service.ProductService		= service.NewProductService(productRepository)
+	outletService 		service.OutletService 		= service.NewOutletService(OutletRepository)
+	jwtService		service.JWTService		= service.NewJWTService()
+	userController		controller.UserController	= controller.NewuserController(userService, jwtService)
 	customerController	controller.CustomerController	= controller.NewCustomerController(customerService, jwtService)
 	productController	controller.ProductController	= controller.NewProductController(productService, jwtService)
+	outletController	controllers.OutletController	= controllers.NewOutletController(outletService, jwtService)
+
 )
 
 func main() {
@@ -49,6 +54,21 @@ func main() {
 	productDiscountRoutes := router.Group("api/productdiscounts",middleware.AuthorizeJWT(jwtService))
 	{
 		productDiscountRoutes.POST("/:product_id", productController.AddDiscount)
+	}
+	outletRoutes := router.Group("api/outlet", middleware.AuthorizeJWT(jwtService))
+	{
+		outletRoutes.GET("/", outletController.GetAllOutlets)
+		outletRoutes.GET("/filter", outletController.GetPaginateFiltering)
+		outletRoutes.POST("/create", outletController.CreateOutlet)
+		outletRoutes.GET("/read", outletController.ReadOutlet)
+		outletRoutes.PUT("/update",outletController.UpdateOutlet)
+		outletRoutes.GET("/read/:outlet_id", outletController.FindByID)
+		outletRoutes.PATCH("/delete/:outlet_id", outletController.DeleteOutlet)
+	}
+	userRouters := router.Group("api/user")
+	{
+		userRouters.POST("/create",userController.Register)
+		userRouters.GET("/", userController.ReadUser)
 	}
 	router.POST("/login", userController.Login)
 	router.POST("/auth/refresh",middleware.AuthorizeJWT(jwtService),userController.Refresh)
