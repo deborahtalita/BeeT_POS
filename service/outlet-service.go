@@ -14,7 +14,9 @@ type OutletService interface {
 	UpdateOutlet(outlet dto.UpdateOutlet) entity.Outlet
 	ReadOutlet() [] entity.Outlet
 	FindByID(outlet_id string) entity.Outlet
-	DeleteOutlet(outlet_id string) error
+	DeleteOutlet(outlet_id string)
+	GetPaginateFiltering(p dto.Pagination) dto.Pagination
+	// GetPaginateFiltering(context *gin.Context,p dto.Pagination) dto.Response
 	IsDuplicate(outlet_name string) bool
 	GetAllPaginate(p dto.Pagination) dto.Pagination
 }
@@ -64,21 +66,67 @@ func (service *outletService) FindByID(outlet_id string) entity.Outlet{
 	return service.OutletRepository.FindByID(outlet_id)
 }
 
-func (service *outletService) DeleteOutlet(outlet_id string) error{
-	outlet := service.OutletRepository.FindByID(outlet_id)
-
-	// if outlet == (entity.Outlet{}) {
-	// 	return errors.New("Outlet tidak ada")
-	// }
-
-	err := service.OutletRepository.DeleteOutlet(outlet)
-	if err != nil{
-		return err
-	}
-
-	return nil
+func (service *outletService) DeleteOutlet(outlet_id string){
+	service.OutletRepository.DeleteOutlet(outlet_id)
 }
 
 func (service *outletService) GetAllPaginate(p dto.Pagination) dto.Pagination {
+
 	return service.OutletRepository.GetAllPaginate(p)
 }
+
+// func (service *outletService) SearchOutlets(p dto.Pagination) dto.Pagination {
+
+// 	// search query params
+// 	// searchQueryParams := ""
+
+// 	// for _, search := range p.Searchs {
+// 	// 	searchQueryParams += fmt.Sprintf("&%s.%s=%s", search.Column, search.Action, search.Query)
+// 	// }
+// 	return service.OutletRepository.GetAllPaginate(p)
+// }
+
+func (service *outletService) GetPaginateFiltering(p dto.Pagination) dto.Pagination {
+
+	return service.OutletRepository.GetPaginateFiltering(p)
+}
+
+// //================================== GET PAGINATE ORIGINAL ==============================================
+// func (service *outletService) GetPaginateFiltering(context *gin.Context, p dto.Pagination) dto.Response{
+// 	operationResult, totalPages :=  service.OutletRepository.GetPaginateFiltering(p)
+
+// 	// if operationResult.Error != nil {
+// 	// 	return dto.Response{Success: false, Message: operationResult.Error.Error()}
+// 	// }
+
+// 	var data = operationResult.Result.(dto.Pagination)
+
+// 	// var data = operationResult.Result.(*dtos.Pagination)
+// 	urlPath := context.Request.URL.Path
+// 	searchQueryParams := ""
+
+// 	for _, search := range p.Searchs {
+// 		searchQueryParams += fmt.Sprintf("&%s.%s=%s", search.Column, search.Action, search.Query)
+// 	}
+
+// 	data.FirstPage = fmt.Sprintf("%s?limit=%d&page=%v&sort=%s", urlPath, p.Limit, 0, p.Sort) + searchQueryParams
+// 	data.LastPage = fmt.Sprintf("%s?limit=%d&page=%v&sort=%s", urlPath, p.Limit, totalPages, p.Sort) + searchQueryParams
+
+	
+// 	if data.Page > 0 {
+// 		// set previous page pagination response
+// 		data.PreviousPage = fmt.Sprintf("%s?limit=%d&page=%d&sort=%s", urlPath, p.Limit, data.Page-1, p.Sort) + searchQueryParams
+// 	}
+
+// 	if data.Page < totalPages {
+// 		// set next page pagination response
+// 		data.NextPage = fmt.Sprintf("%s?limit=%d&page=%d&sort=%s", urlPath, p.Limit, data.Page+1, p.Sort) + searchQueryParams
+// 	}
+
+// 	if data.Page > totalPages {
+// 		// reset previous page
+// 		data.PreviousPage = ""
+// 	}
+
+// 	return dto.Response{Success: true, Data: data}
+// }
